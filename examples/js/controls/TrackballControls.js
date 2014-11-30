@@ -140,7 +140,7 @@ THREE.TrackballControls = function ( object, domElement, target, updateCallback 
 				} else {
 
 					mouseOnBall.z = .5 / length;
-					
+
 				}
 
 			} else if ( length > 1.0 ) {
@@ -595,7 +595,10 @@ THREE.TrackballControls = function ( object, domElement, target, updateCallback 
 	window.addEventListener( 'keyup', keyup, false );
 
   $(this.domElement).bind('resizeCanvas', function(e) {
-     _this.handleResize();
+     // Handle resize after UI changes happened
+     window.setTimeout(function(){
+        _this.handleResize();
+     }, 0);
   });
 
 	this.handleResize();
