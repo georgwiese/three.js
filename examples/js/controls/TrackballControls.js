@@ -86,11 +86,15 @@ THREE.TrackballControls = function ( object, domElement, target, updateCallback 
 
 		} else {
 
-			this.screen = this.domElement.getBoundingClientRect();
+			var clientRect = this.domElement.getBoundingClientRect();
+			this.screen.top = clientRect.top;
+			this.screen.left = clientRect.left;
+			this.screen.width = clientRect.width;
+			this.screen.height = clientRect.height;
 			// adjustments come from similar code in the jquery offset() function
-			var d = this.domElement.ownerDocument.documentElement
-			this.screen.left += window.pageXOffset - d.clientLeft
-			this.screen.top += window.pageYOffset - d.clientTop
+			var d = this.domElement.ownerDocument.documentElement;
+			this.screen.left += window.pageXOffset - d.clientLeft;
+			this.screen.top += window.pageYOffset - d.clientTop;
 
 		}
 
@@ -140,7 +144,7 @@ THREE.TrackballControls = function ( object, domElement, target, updateCallback 
 				} else {
 
 					mouseOnBall.z = .5 / length;
-					
+
 				}
 
 			} else if ( length > 1.0 ) {
@@ -405,7 +409,7 @@ THREE.TrackballControls = function ( object, domElement, target, updateCallback 
 
 		if ( _state === STATE.ROTATE && !_this.noRotate ) {
 
-			_this.getMouseProjectionOnBall( event.clientX, event.clientY, _rotateStart );
+			_this.getMouseProjectionOnBall( event.pageX, event.pageY, _rotateStart );
 			_rotateEnd.copy(_rotateStart)
 
 		} else if ( _state === STATE.ZOOM && !_this.noZoom ) {
@@ -436,7 +440,7 @@ THREE.TrackballControls = function ( object, domElement, target, updateCallback 
 
 		if ( _state === STATE.ROTATE && !_this.noRotate ) {
 
-			_this.getMouseProjectionOnBall( event.clientX, event.clientY, _rotateEnd );
+			_this.getMouseProjectionOnBall( event.pageX, event.pageY, _rotateEnd );
 			_this.update();
 
 		} else if ( _state === STATE.ZOOM && !_this.noZoom ) {
