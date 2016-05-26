@@ -17,8 +17,6 @@ THREE.TrackballControls = function ( object, domElement, target, updateCallback 
 	this.enabled = true;
 	this.keyboardEnabled = false;
 
-	this.screen = { left: 0, top: 0, width: 0, height: 0 };
-
 	this.rotateSpeed = 1.0;
 	this.zoomSpeed = 1.2;
 	this.panSpeed = 0.3;
@@ -75,29 +73,15 @@ THREE.TrackballControls = function ( object, domElement, target, updateCallback 
 
 	// methods
 
-	this.handleResize = function () {
-
-		if ( this.domElement === document ) {
-
-			this.screen.left = 0;
-			this.screen.top = 0;
-			this.screen.width = window.innerWidth;
-			this.screen.height = window.innerHeight;
-
-		} else {
-
-			var clientRect = this.domElement.getBoundingClientRect();
-			this.screen.top = clientRect.top;
-			this.screen.left = clientRect.left;
-			this.screen.width = clientRect.width;
-			this.screen.height = clientRect.height;
-			// adjustments come from similar code in the jquery offset() function
-			var d = this.domElement.ownerDocument.documentElement;
-			this.screen.left += window.pageXOffset - d.clientLeft;
-			this.screen.top += window.pageYOffset - d.clientTop;
-
-		}
-
+	this.getScreenBounds = function() {
+		var clientRect = this.domElement.getBoundingClientRect();
+		var d = this.domElement.ownerDocument.documentElement;
+		return {
+			top : clientRect.top + window.pageYOffset - d.clientTop,
+			left : clientRect.left + window.pageXOffset - d.clientLeft,
+			width : clientRect.width,
+			height : clientRect.height
+		};
 	};
 
 	this.handleEvent = function ( event ) {
@@ -112,9 +96,11 @@ THREE.TrackballControls = function ( object, domElement, target, updateCallback 
 
 	this.getMouseOnScreen = function ( pageX, pageY, vector ) {
 
+		var screenBounds = _this.getScreenBounds()
+
 		return vector.set(
-			( pageX - _this.screen.left ) / _this.screen.width,
-			( pageY - _this.screen.top ) / _this.screen.height
+			( pageX - screenBounds.left ) / screenBounds.width,
+			( pageY - screenBounds.top ) / screenBounds.height
 		);
 
 	};
@@ -127,9 +113,11 @@ THREE.TrackballControls = function ( object, domElement, target, updateCallback 
 
 		return function ( pageX, pageY, projection ) {
 
+			var screenBounds = _this.getScreenBounds()
+
 			mouseOnBall.set(
-				( pageX - _this.screen.width * 0.5 - _this.screen.left ) / (_this.screen.width*.5),
-				( _this.screen.height * 0.5 + _this.screen.top - pageY ) / (_this.screen.height*.5),
+				( pageX - screenBounds.width * 0.5 - screenBounds.left ) / (screenBounds.width*.5),
+				( screenBounds.height * 0.5 + screenBounds.top - pageY ) / (screenBounds.height*.5),
 				0.0
 			);
 
@@ -597,12 +585,6 @@ THREE.TrackballControls = function ( object, domElement, target, updateCallback 
 
 	window.addEventListener( 'keydown', keydown, false );
 	window.addEventListener( 'keyup', keyup, false );
-
-  $(this.domElement).bind('resizeCanvas', function(e) {
-     _this.handleResize();
-  });
-
-	this.handleResize();
 	this.update();
 
 };
